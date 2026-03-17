@@ -1,0 +1,205 @@
+{
+  "framework_config": {
+    "pillar_weights": {
+      "team": 0.25,
+      "market_timing": 0.2,
+      "product_value_prop": 0.15,
+      "traction_pmf": 0.15,
+      "business_model_unit_econ": 0.15,
+      "deal_financing_risk": 0.1
+    },
+    "score_scale": {
+      "1": "Fatal issue, deal breaker",
+      "2": "Significant concern, requires resolution",
+      "3": "Acceptable, typical for stage",
+      "4": "Strong signal, above average",
+      "5": "Outstanding, rare and highly differentiated"
+    },
+    "decision_thresholds": {
+      "go_min_weighted": 3.5,
+      "conditional_min_weighted": 3.0,
+      "fatal_if_any_pillar_leq": 1,
+      "minimum_pillar_scores": {
+        "team": 3,
+        "market_timing": 3,
+        "product_value_prop": 3,
+        "traction_pmf": 2,
+        "business_model_unit_econ": 3,
+        "deal_financing_risk": 3
+      }
+    },
+    "required_evidence_by_pillar": {
+      "team": [
+        "Founder reference calls",
+        "Execution history",
+        "Coachability evidence",
+        "Complementary skill coverage"
+      ],
+      "market_timing": [
+        "Third-party TAM source",
+        "Market growth trend",
+        "Competitive map",
+        "Why-now rationale",
+        "Customer concentration"
+      ],
+      "product_value_prop": [
+        "One-sentence UVP",
+        "10x differentiation proof",
+        "Defensibility/IP data",
+        "Retention and PMF indicators"
+      ],
+      "traction_pmf": [
+        "Paying customers",
+        "Growth quality (not discounts)",
+        "Retention/churn",
+        "NPS / expansion signals"
+      ],
+      "business_model_unit_econ": [
+        "Revenue model clarity",
+        "Gross margin",
+        "CAC/LTV",
+        "Payback period",
+        "Path to profitability"
+      ],
+      "deal_financing_risk": [
+        "Cap table health",
+        "Terms quality",
+        "Use-of-funds milestones",
+        "Top 5 risks + mitigations",
+        "Exit path clarity"
+      ]
+    },
+    "red_flags": [
+      "No paying customers after 2+ years",
+      "LTV lower than CAC",
+      "No articulated risks",
+      "Founder diluted below 10%",
+      "TAM unsupported by third-party sources",
+      "Single customer concentration above 50%",
+      "High churn with no mitigation plan"
+    ],
+    "bias_checks": [
+      "Independent pillar scoring before group discussion",
+      "Assign red-team reviewer",
+      "Check representativeness and halo effects",
+      "Check anchoring on initial valuation/revenue numbers",
+      "Separate founder quality from deal quality in scoring"
+    ]
+  },
+  "framework_document": {
+    "title": "The Complete Startup Evaluation Framework",
+    "version": "1.0",
+    "date": "March 2026",
+    "based_on": [
+      "Kaplan OUTSIDE-IMPACTS Framework",
+      "Qubit Capital Checklist",
+      "Seraf Early-Stage Due Diligence",
+      "Chicago Booth Research"
+    ],
+    "executive_summary": {
+      "principle": "Ruthless prioritization is essential",
+      "screening_baseline": "~200 screened per year, ~4 funded",
+      "full_dd_benchmark": "~118 hours, ~10 customer references, ~83 days"
+    },
+    "core_assumptions": [
+      "Team quality is highest predictor of outcome",
+      "Market size and timing set hard return ceiling",
+      "Traction is customer pull, not founder push",
+      "Unit economics determine scalability truth",
+      "Risk articulation is a strength",
+      "Bias must be actively named and mitigated",
+      "No framework guarantees outcomes"
+    ],
+    "outside_impacts": {
+      "outside": ["Opportunity", "Uncertainty", "Team", "Strategy", "Investment", "Deal Terms", "Exit"],
+      "impacts": ["Idea", "Market", "Proprietary", "Acceptance", "Competition", "Time", "Speed"]
+    },
+    "pillars": {
+      "team": {
+        "weight": 25,
+        "importance": "Foundation of execution",
+        "red_flags": [
+          "Solo founder without strong advisory board",
+          "Frequent founder turnover",
+          "No evidence of execution track record",
+          "Defensive response to feedback"
+        ]
+      },
+      "market_timing": {
+        "weight": 20,
+        "importance": "Upper bound on returns",
+        "red_flags": [
+          "Inflated TAM with no third-party sources",
+          "No clear why-now",
+          "Shrinking/stagnant category",
+          "Unhealthy customer concentration"
+        ]
+      },
+      "product_value_prop": {
+        "weight": 15,
+        "importance": "Defensibility and demand",
+        "red_flags": [
+          "Unclear UVP",
+          "No defensibility",
+          "No willingness-to-pay evidence",
+          "Early high churn"
+        ]
+      },
+      "traction_pmf": {
+        "weight": 15,
+        "importance": "Proof of reality",
+        "red_flags": [
+          "No paying customers",
+          "Growth driven by discounts only",
+          "High churn",
+          "Low or declining NPS"
+        ]
+      },
+      "business_model_unit_econ": {
+        "weight": 15,
+        "importance": "Scalability and profitability",
+        "red_flags": [
+          "No CAC/LTV visibility",
+          "LTV below CAC",
+          "Payback above acceptable range",
+          "Margins structurally too low"
+        ]
+      },
+      "deal_financing_risk": {
+        "weight": 10,
+        "importance": "Alignment and protection",
+        "red_flags": [
+          "Founder heavily diluted",
+          "Toxic terms",
+          "No clear risk map",
+          "No realistic exit pathway"
+        ]
+      }
+    },
+    "due_diligence_phases": [
+      "Phase 1: Pre-Screen",
+      "Phase 2: Information Request",
+      "Phase 3: Deep Dives by Pillar",
+      "Phase 4: Investment Memo & Scoring",
+      "Phase 5: Decision & Investment Conditions"
+    ],
+    "bias_mitigation": [
+      "Name deal champion and memo writer separately",
+      "Assign independent red-team",
+      "Require independent scoring before IC discussion",
+      "Pressure-test analogies to prior wins/losses"
+    ],
+    "expected_funnel": {
+      "prescreen_filter_out": "70-80%",
+      "pass_to_full_dd": "10-15%",
+      "investment_rate": "5-10%"
+    },
+    "references": [
+      "Kaplan & Strömberg (2003)",
+      "Chicago Booth / Kaplan OUTSIDE-IMPACTS",
+      "Qubit Capital Evaluation Checklist",
+      "Seraf DD resources",
+      "Gompers et al. (2020)"
+    ]
+  }
+}

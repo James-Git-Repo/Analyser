@@ -1,0 +1,81 @@
+{
+  "website_url": "https://example.com",
+  "answers": {
+    "problem_solution": "Automazione compliance e reporting ESG per PMI manifatturiere.",
+    "value_proposition": "Riduzione tempo audit del 40% e miglior accesso a procurement enterprise.",
+    "traction": "12 clienti paganti in CH/IT, churn 2%, pipeline 55 opportunità.",
+    "competition_innovation": "Motore proprietario di normalizzazione dati normativi multi-giurisdizione.",
+    "economics_drivers": "ARR medio 28k CHF, gross margin 78%, CAC payback 11 mesi.",
+    "ip_strategy": "Know-how proprietario + filing software method in corso.",
+    "regulatory_compliance": "Conformità GDPR/FADP e controlli ISO 27001 pianificati."
+  },
+  "verification_context": {
+    "benchmark_references": [
+      "Kaplan OUTSIDE-IMPACTS",
+      "Qubit Capital startup evaluation checklist",
+      "Seraf early-stage due diligence checklist",
+      "Chicago Booth / Kaplan & Strömberg research"
+    ],
+    "quality_rules": [
+      "Penalize unsupported TAM, traction and unit economics claims",
+      "Require customer validation and retention evidence",
+      "Flag weak defensibility and unclear why-now timing",
+      "Apply bias checks and red-team logic in decision recommendation"
+    ],
+    "framework_config": {
+      "pillar_weights": {
+        "team": 0.25,
+        "market_timing": 0.2,
+        "product_value_prop": 0.15,
+        "traction_pmf": 0.15,
+        "business_model_unit_econ": 0.15,
+        "deal_financing_risk": 0.1
+      },
+      "decision_thresholds": {
+        "go_min_weighted": 3.5,
+        "conditional_min_weighted": 3.0,
+        "fatal_if_any_pillar_leq": 1,
+        "minimum_pillar_scores": {
+          "team": 3,
+          "market_timing": 3,
+          "product_value_prop": 3,
+          "traction_pmf": 2,
+          "business_model_unit_econ": 3,
+          "deal_financing_risk": 3
+        }
+      },
+      "required_evidence_by_pillar": {
+        "team": ["Founder references", "Execution track record"],
+        "market_timing": ["Third-party TAM", "Why-now rationale"],
+        "product_value_prop": ["Clear UVP", "Defensibility evidence"],
+        "traction_pmf": ["Paying customers", "Retention evidence"],
+        "business_model_unit_econ": ["CAC/LTV", "Gross margin", "Payback"],
+        "deal_financing_risk": ["Cap table", "Risk map + mitigations"]
+      },
+      "red_flags": [
+        "No paying customers after 2+ years",
+        "LTV lower than CAC",
+        "Founder diluted below 10%",
+        "No articulated risks"
+      ],
+      "bias_checks": [
+        "Independent pillar scoring before committee discussion",
+        "Assign red-team reviewer",
+        "Check representativeness/halo/anchoring bias"
+      ]
+    },
+    "framework_document": {
+      "title": "The Complete Startup Evaluation Framework",
+      "version": "1.0",
+      "date": "March 2026",
+      "based_on": [
+        "Kaplan OUTSIDE-IMPACTS",
+        "Qubit Capital Checklist",
+        "Seraf Early-Stage Due Diligence",
+        "Chicago Booth Research"
+      ],
+      "note": "Full structured framework template available in examples/verification_context.framework.json"
+    },
+    "additional_verification_info": "Include independent security assessment, legal opinion on IP, reference calls with customers, and replicable market-comparison methodology."
+  }
+}
