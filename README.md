@@ -1,19 +1,18 @@
-# Startup Evaluator 360 (LLM API + Website Analysis)
+# Startup Evaluator 360 (Market & Investor Readiness)
 
-Questo tool usa un **modello LLM via API** per valutare una startup su 35 criteri (score 1-10), partendo da:
-- **contenuto del sito web** della startup,
-- **risposte ai criteri** che fornisci in input,
-- **benchmark/regole di verifica**.
+Tool LLM che valuta startup con priorità su:
+1. **Market readiness**
+2. **Investor readiness**
 
-In output ottieni anche una **relative analysis** (confronto con soluzioni esistenti) e una stima di **investor/commercial readiness per la Svizzera**.
+L’analisi prodotto è trattata come supporto backend: confronto col mercato, tipo prodotto e attrattività (IP intensity, scalabilità, contesto normativo/economico), con focus operativo su **Svizzera**.
 
 ## Input richiesto
-Il file JSON deve includere:
-- `website_url`: URL del sito da analizzare.
-- `answers`: dizionario con risposte qualitative/quantitative ai criteri.
-- `verification_context`: benchmark references + quality rules + info addizionali.
+JSON con:
+- `website_url`: URL del sito della startup
+- `answers`: risposte a criteri/claim chiave
+- `verification_context`: benchmark e regole di qualità per validare i claim
 
-Esempio pronto: `examples/startup_input.example.json`.
+Esempio: `examples/startup_input.example.json`.
 
 ## Setup API
 
@@ -33,6 +32,14 @@ Output:
 - `evaluation_report.json`
 - `evaluation_report.md`
 
+## Cosa trovi nel report
+- Score su 35 criteri
+- `market_readiness_score` e `investor_readiness_score`
+- `product_backend_support_score`
+- Analisi attrattività prodotto (IP intensity, scalability, regulatory/economic tailwind)
+- Relative analysis vs alternative di mercato
+- Bloccanti e next steps per investor/commercial readiness in Svizzera
+
 ## Opzioni utili
 
 ```bash
@@ -40,10 +47,3 @@ python3 startup_evaluator.py --input my_input.json --output out.json --markdown 
 python3 startup_evaluator.py --input my_input.json --max-website-chars 15000
 python3 startup_evaluator.py --input my_input.json --dry-run
 ```
-
-- `--max-website-chars`: limita il testo estratto dal sito prima della valutazione.
-- `--dry-run`: stampa il payload completo inviato al modello (debug).
-
-## Note pratiche
-- Se il fetch del sito fallisce, il processo continua usando comunque le risposte e il contesto forniti.
-- La qualità della valutazione dipende dalla qualità delle fonti/benchmark inseriti in `verification_context`.

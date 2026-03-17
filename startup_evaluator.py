@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Valutatore startup a 360° con scoring eseguito da LLM via API."""
+"""Valutatore startup con focus market/investor readiness via LLM API."""
 
 from __future__ import annotations
 
@@ -61,23 +61,25 @@ CRITERIA = [
 
 SYSTEM_PROMPT = """You are a venture evaluation analyst.
 Output MUST be valid JSON only, without markdown fences.
-You evaluate startup quality on each criterion from 1-10 using evidence provided.
-If evidence is weak, score lower and explicitly explain what is missing.
+Primary objective: evaluate MARKET READINESS and INVESTOR READINESS.
+Secondary objective: evaluate product backend strength as enabler of market/investor outcomes.
+Assess product type and attractiveness (IP intensity, scalability, regulatory/economic context fit).
 Perform relative analysis against existing and adjacent competing solutions.
-Assess if the company is investor-ready and commercial-ready specifically for Switzerland.
+Assess readiness specifically for Switzerland.
+If evidence is weak, score lower and clearly state what is missing.
 Use concise, concrete rationales.
 """
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Valuta startup via LLM API su framework 35 criteri.")
+    parser = argparse.ArgumentParser(description="Valutazione startup con focus market/investor readiness.")
     parser.add_argument("--input", required=True, help="Path JSON con website URL, risposte ai criteri e benchmark.")
     parser.add_argument("--output", default="evaluation_report.json", help="File JSON output.")
     parser.add_argument("--markdown", default="evaluation_report.md", help="File Markdown output.")
     parser.add_argument("--model", default=os.getenv("LLM_MODEL", "gpt-4o-mini"), help="Nome modello API.")
     parser.add_argument("--api-base", default=os.getenv("LLM_API_BASE", "https://api.openai.com/v1"), help="Base URL API compatibile OpenAI.")
-    parser.add_argument("--api-key", default=os.getenv("LLM_API_KEY"), help="API key. In alternativa usare env LLM_API_KEY.")
-    parser.add_argument("--max-website-chars", type=int, default=12000, help="Numero massimo di caratteri da estrarre dal sito web.")
+    parser.add_argument("--api-key", default=os.getenv("LLM_API_KEY"), help="API key. In alternativa usa env LLM_API_KEY.")
+    parser.add_argument("--max-website-chars", type=int, default=12000, help="Numero massimo di caratteri estratti dal sito.")
     parser.add_argument("--dry-run", action="store_true", help="Stampa payload senza chiamare API.")
     return parser.parse_args()
 
@@ -86,8 +88,7 @@ def clean_html(html: str) -> str:
     html = re.sub(r"<script[\s\S]*?</script>", " ", html, flags=re.IGNORECASE)
     html = re.sub(r"<style[\s\S]*?</style>", " ", html, flags=re.IGNORECASE)
     text = re.sub(r"<[^>]+>", " ", html)
-    text = unescape(text)
-    return re.sub(r"\s+", " ", text).strip()
+    return re.sub(r"\s+", " ", unescape(text)).strip()
 
 
 def fetch_website_text(url: str, max_chars: int) -> str:
@@ -100,17 +101,15 @@ def fetch_website_text(url: str, max_chars: int) -> str:
 def load_input(path: str, max_website_chars: int) -> dict[str, Any]:
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
-
     required = ["website_url", "answers", "verification_context"]
     missing = [k for k in required if k not in data]
     if missing:
         raise ValueError(f"Campi obbligatori mancanti in input JSON: {', '.join(missing)}")
 
-    website_text = ""
-    website_error = None
+    website_text, website_error = "", None
     try:
-        website_text = fetch_website_text(data["website_url"], max_chars=max_website_chars)
-    except Exception as exc:  # network/website issues should not block run
+        website_text = fetch_website_text(data["website_url"], max_website_chars)
+    except Exception as exc:
         website_error = str(exc)
 
     data["website_content"] = {
@@ -123,48 +122,63 @@ def load_input(path: str, max_website_chars: int) -> dict[str, Any]:
 
 def build_user_prompt(data: dict[str, Any]) -> str:
     schema = {
-        "scores": [
-            {
-                "criterion_id": "string",
-                "question": "string",
-                "category": "string",
-                "score": "int 1-10",
-                "rationale": "string (max 50 words)",
-                "evidence_strength": "low|medium|high",
-                "verification_checks": ["string"],
-                "benchmark_comparison": "string (max 40 words)",
-            }
-        ],
+        "scores": [{
+            "criterion_id": "string",
+            "question": "string",
+            "category": "string",
+            "score": "int 1-10",
+            "rationale": "string (max 50 words)",
+            "evidence_strength": "low|medium|high",
+            "verification_checks": ["string"],
+            "benchmark_comparison": "string (max 40 words)"
+        }],
+        "readiness_focus": {
+            "market_readiness_score": "int 1-10",
+            "investor_readiness_score": "int 1-10",
+            "product_backend_support_score": "int 1-10",
+            "readiness_summary": "string"
+        },
+        "product_market_fit_analysis": {
+            "product_type": "string",
+            "attractiveness_summary": "string",
+            "ip_intensity_score": "int 1-10",
+            "scalability_score": "int 1-10",
+            "regulatory_economic_tailwind_score": "int 1-10"
+        },
         "relative_analysis": {
             "existing_alternatives": ["string"],
             "functional_gap_vs_market": "string",
-            "differentiation_score": "int 1-10",
+            "differentiation_score": "int 1-10"
         },
         "switzerland_readiness": {
             "investor_ready_score": "int 1-10",
             "commercial_ready_score": "int 1-10",
             "top_blockers": ["string"],
             "recommended_next_steps": ["string"],
-            "swiss_regulatory_notes": ["string"],
+            "swiss_regulatory_notes": ["string"]
         },
-        "overall_score": "float 1-10",
         "brief_report_it": "string in Italian, max 200 words",
-        "priority_actions": ["string", "string", "string"],
+        "priority_actions": ["string", "string", "string"]
     }
     prompt_payload = {
         "criteria": [asdict(c) for c in CRITERIA],
         "website_content": data["website_content"],
         "answers_to_criteria": data["answers"],
         "verification_context": data["verification_context"],
-        "target_market_focus": "Switzerland",
+        "evaluation_priority": {
+            "primary": ["market_readiness", "investor_readiness"],
+            "secondary": ["product_backend_strength", "relative_competitiveness"],
+            "target_market_focus": "Switzerland"
+        },
         "output_schema": schema,
         "instructions": [
             "Use website content + provided answers + verification references.",
-            "Do not invent customers, revenues, patents, or regulatory approvals.",
+            "Do not invent customers, revenues, patents, certifications, or regulatory approvals.",
             "If uncertain, state uncertainty and reduce score accordingly.",
             "Ensure every criterion_id appears exactly once.",
-            "Relative analysis must compare against known solution categories and direct alternatives.",
-            "Swiss readiness must include practical investor/commercial blockers and next 90-day actions.",
+            "Relative analysis must compare against direct and indirect alternatives.",
+            "Swiss readiness must include practical investor/commercial blockers and 90-day actions.",
+            "Explain how product characteristics (IP, scalability, deployment, regulation) influence readiness."
         ],
     }
     return json.dumps(prompt_payload, ensure_ascii=False)
@@ -196,35 +210,35 @@ def call_llm(*, api_base: str, api_key: str, model: str, user_prompt: str) -> di
         details = e.read().decode("utf-8", errors="ignore")
         raise RuntimeError(f"Errore HTTP API ({e.code}): {details}") from e
 
-    content = body["choices"][0]["message"]["content"]
-    return json.loads(content)
+    return json.loads(body["choices"][0]["message"]["content"])
+
+
+def clamp_1_10(value: Any) -> int:
+    try:
+        parsed = int(round(float(value)))
+    except Exception:
+        parsed = 1
+    return max(1, min(10, parsed))
 
 
 def normalize_result(result: dict[str, Any]) -> dict[str, Any]:
     by_id = {c.id: c for c in CRITERIA}
     id_order = {c.id: i for i, c in enumerate(CRITERIA)}
-    seen = set()
-    normalized_scores = []
+    seen: set[str] = set()
+    normalized_scores: list[dict[str, Any]] = []
 
     for item in result.get("scores", []):
         cid = item.get("criterion_id")
         if cid not in by_id or cid in seen:
             continue
         seen.add(cid)
-        score = item.get("score", 1)
-        if not isinstance(score, int):
-            try:
-                score = int(round(float(score)))
-            except Exception:
-                score = 1
-        score = max(1, min(10, score))
         crit = by_id[cid]
         normalized_scores.append(
             {
                 "criterion_id": cid,
                 "question": crit.question,
                 "category": crit.category,
-                "score": score,
+                "score": clamp_1_10(item.get("score", 1)),
                 "rationale": item.get("rationale", ""),
                 "evidence_strength": item.get("evidence_strength", "unknown"),
                 "verification_checks": item.get("verification_checks", []),
@@ -248,27 +262,50 @@ def normalize_result(result: dict[str, Any]) -> dict[str, Any]:
         )
 
     normalized_scores.sort(key=lambda x: id_order[x["criterion_id"]])
-    overall = round(sum(s["score"] for s in normalized_scores) / len(normalized_scores), 2)
+    criteria_mean = round(sum(s["score"] for s in normalized_scores) / len(normalized_scores), 2)
+
+    readiness = result.get("readiness_focus", {})
+    market_r = clamp_1_10(readiness.get("market_readiness_score", 1))
+    investor_r = clamp_1_10(readiness.get("investor_readiness_score", 1))
+    backend_r = clamp_1_10(readiness.get("product_backend_support_score", 1))
+
+    weighted_overall = round((0.4 * market_r) + (0.4 * investor_r) + (0.2 * criteria_mean), 2)
+
     report = str(result.get("brief_report_it", "")).strip()
     if len(report.split()) > 200:
         report = " ".join(report.split()[:200])
 
-    swiss = result.get("switzerland_readiness", {})
+    product_fit = result.get("product_market_fit_analysis", {})
     relative = result.get("relative_analysis", {})
+    swiss = result.get("switzerland_readiness", {})
 
     return {
         "scores": normalized_scores,
-        "overall_score": overall,
+        "criteria_average_score": criteria_mean,
+        "overall_score": weighted_overall,
         "brief_report_it": report,
         "priority_actions": result.get("priority_actions", [])[:3],
+        "readiness_focus": {
+            "market_readiness_score": market_r,
+            "investor_readiness_score": investor_r,
+            "product_backend_support_score": backend_r,
+            "readiness_summary": readiness.get("readiness_summary", ""),
+        },
+        "product_market_fit_analysis": {
+            "product_type": product_fit.get("product_type", ""),
+            "attractiveness_summary": product_fit.get("attractiveness_summary", ""),
+            "ip_intensity_score": clamp_1_10(product_fit.get("ip_intensity_score", 1)),
+            "scalability_score": clamp_1_10(product_fit.get("scalability_score", 1)),
+            "regulatory_economic_tailwind_score": clamp_1_10(product_fit.get("regulatory_economic_tailwind_score", 1)),
+        },
         "relative_analysis": {
             "existing_alternatives": relative.get("existing_alternatives", []),
             "functional_gap_vs_market": relative.get("functional_gap_vs_market", ""),
-            "differentiation_score": max(1, min(10, int(relative.get("differentiation_score", 1) or 1))),
+            "differentiation_score": clamp_1_10(relative.get("differentiation_score", 1)),
         },
         "switzerland_readiness": {
-            "investor_ready_score": max(1, min(10, int(swiss.get("investor_ready_score", 1) or 1))),
-            "commercial_ready_score": max(1, min(10, int(swiss.get("commercial_ready_score", 1) or 1))),
+            "investor_ready_score": clamp_1_10(swiss.get("investor_ready_score", investor_r)),
+            "commercial_ready_score": clamp_1_10(swiss.get("commercial_ready_score", market_r)),
             "top_blockers": swiss.get("top_blockers", []),
             "recommended_next_steps": swiss.get("recommended_next_steps", []),
             "swiss_regulatory_notes": swiss.get("swiss_regulatory_notes", []),
@@ -280,10 +317,20 @@ def write_markdown(path: str, final: dict[str, Any]) -> None:
     lines = [
         "# Startup Evaluation Report",
         "",
-        f"**Overall score:** {final['overall_score']}/10",
+        f"**Overall score (weighted):** {final['overall_score']}/10",
+        f"**Criteria average score:** {final['criteria_average_score']}/10",
+        f"**Market readiness:** {final['readiness_focus']['market_readiness_score']}/10",
+        f"**Investor readiness:** {final['readiness_focus']['investor_readiness_score']}/10",
+        f"**Product backend support:** {final['readiness_focus']['product_backend_support_score']}/10",
         f"**Differentiation score:** {final['relative_analysis']['differentiation_score']}/10",
-        f"**Switzerland investor-ready:** {final['switzerland_readiness']['investor_ready_score']}/10",
-        f"**Switzerland commercial-ready:** {final['switzerland_readiness']['commercial_ready_score']}/10",
+        "",
+        "## Product attractiveness",
+        "",
+        f"- Product type: {final['product_market_fit_analysis']['product_type']}",
+        f"- Attractiveness: {final['product_market_fit_analysis']['attractiveness_summary']}",
+        f"- IP intensity: {final['product_market_fit_analysis']['ip_intensity_score']}/10",
+        f"- Scalability: {final['product_market_fit_analysis']['scalability_score']}/10",
+        f"- Regulatory/economic tailwind: {final['product_market_fit_analysis']['regulatory_economic_tailwind_score']}/10",
         "",
         "## Scores by Criterion",
         "",
@@ -296,9 +343,8 @@ def write_markdown(path: str, final: dict[str, Any]) -> None:
     lines.extend(["", "## Relative analysis", ""])
     for alt in final["relative_analysis"].get("existing_alternatives", []):
         lines.append(f"- Alternative: {alt}")
-    gap = final["relative_analysis"].get("functional_gap_vs_market", "")
-    if gap:
-        lines.extend(["", f"Gap vs market: {gap}"])
+    if final["relative_analysis"].get("functional_gap_vs_market"):
+        lines.append(f"- Gap vs market: {final['relative_analysis']['functional_gap_vs_market']}")
 
     lines.extend(["", "## Switzerland readiness", "", "### Top blockers"])
     for blocker in final["switzerland_readiness"].get("top_blockers", []):
@@ -306,6 +352,7 @@ def write_markdown(path: str, final: dict[str, Any]) -> None:
     lines.extend(["", "### Recommended next steps"])
     for step in final["switzerland_readiness"].get("recommended_next_steps", []):
         lines.append(f"- {step}")
+
     lines.extend(["", "### Swiss regulatory notes"])
     for note in final["switzerland_readiness"].get("swiss_regulatory_notes", []):
         lines.append(f"- {note}")
@@ -338,7 +385,7 @@ def main() -> int:
 
     print(f"Report JSON: {args.output}")
     print(f"Report MD: {args.markdown}")
-    print(f"Overall score: {final['overall_score']}/10")
+    print(f"Overall weighted score: {final['overall_score']}/10")
     return 0
 
 

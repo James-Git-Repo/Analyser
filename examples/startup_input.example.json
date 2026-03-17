@@ -1,26 +1,28 @@
 {
   "website_url": "https://example.com",
   "answers": {
-    "problem_solution": "Riduciamo i costi energetici industriali con un sistema modulare installabile on-site in 3 giorni.",
-    "competition_innovation": "Abbiamo un CAPEX inferiore del 20% rispetto a sistemi tradizionali e analytics predittivi inclusi.",
-    "traction": "6 piloti completati, 3 clienti paganti, NPS medio 54.",
-    "economics_drivers": "Prezzo medio 45k CHF per unità + 12% annuo service fee.",
-    "regulatory_compliance": "Checklist sicurezza macchine e certificazione elettrica in corso per CH/EU.",
-    "team_fit": "Team con esperienza in thermal engineering, operations e vendite B2B industriali."
+    "problem_solution": "Automazione compliance e reporting ESG per PMI manifatturiere.",
+    "value_proposition": "Riduzione tempo audit del 40% e miglior accesso a procurement enterprise.",
+    "traction": "12 clienti paganti in CH/IT, churn 2%, pipeline 55 opportunità.",
+    "competition_innovation": "Motore proprietario di normalizzazione dati normativi multi-giurisdizione.",
+    "economics_drivers": "ARR medio 28k CHF, gross margin 78%, CAC payback 11 mesi.",
+    "ip_strategy": "Know-how proprietario + filing software method in corso.",
+    "regulatory_compliance": "Conformità GDPR/FADP e controlli ISO 27001 pianificati."
   },
   "verification_context": {
     "benchmark_references": [
-      "IEA industrial heat efficiency reports",
-      "Swiss energy market studies (BFE/UFE)",
-      "Public startup hardware margin benchmarks",
-      "Customer pilot KPI baseline and maintenance logs"
+      "Swiss SaaS B2B benchmarks (growth, CAC payback, net retention)",
+      "Public competitor pricing and feature matrices",
+      "Swiss procurement and compliance requirement checklists",
+      "Investor due diligence templates for seed/Series A in DACH"
     ],
     "quality_rules": [
-      "Prefer measured pilot data over forecast assumptions",
-      "Penalize claims without source or replicable methodology",
-      "Compare performance and TCO with at least 2 alternative solution categories",
-      "Assess Swiss go-to-market constraints: certification, procurement cycles, channel partners"
+      "Prefer customer-level evidence over founder claims",
+      "Penalize unsupported TAM assumptions",
+      "Assess if product moat is defensible (IP/data/distribution)",
+      "Quantify commercial readiness with sales cycle, conversion and retention data",
+      "Quantify investor readiness with unit economics, governance and reporting quality"
     ],
-    "additional_verification_info": "Use external audits, LOIs, independent product tests, legal/IP due diligence and deployment lead-time logs to validate readiness."
+    "additional_verification_info": "Include independent security assessment, legal opinion on IP, reference calls with customers, and replicable market-comparison methodology."
   }
 }
