@@ -1,0 +1,26 @@
+{
+  "website_url": "https://example.com",
+  "answers": {
+    "problem_solution": "Riduciamo i costi energetici industriali con un sistema modulare installabile on-site in 3 giorni.",
+    "competition_innovation": "Abbiamo un CAPEX inferiore del 20% rispetto a sistemi tradizionali e analytics predittivi inclusi.",
+    "traction": "6 piloti completati, 3 clienti paganti, NPS medio 54.",
+    "economics_drivers": "Prezzo medio 45k CHF per unità + 12% annuo service fee.",
+    "regulatory_compliance": "Checklist sicurezza macchine e certificazione elettrica in corso per CH/EU.",
+    "team_fit": "Team con esperienza in thermal engineering, operations e vendite B2B industriali."
+  },
+  "verification_context": {
+    "benchmark_references": [
+      "IEA industrial heat efficiency reports",
+      "Swiss energy market studies (BFE/UFE)",
+      "Public startup hardware margin benchmarks",
+      "Customer pilot KPI baseline and maintenance logs"
+    ],
+    "quality_rules": [
+      "Prefer measured pilot data over forecast assumptions",
+      "Penalize claims without source or replicable methodology",
+      "Compare performance and TCO with at least 2 alternative solution categories",
+      "Assess Swiss go-to-market constraints: certification, procurement cycles, channel partners"
+    ],
+    "additional_verification_info": "Use external audits, LOIs, independent product tests, legal/IP due diligence and deployment lead-time logs to validate readiness."
+  }
+}
