@@ -1,0 +1,63 @@
+name: Startup Evaluator
+
+on:
+  workflow_dispatch:
+    inputs:
+      input_json:
+        description: "Path to input JSON in repo (e.g. examples/startup_input.example.json)"
+        required: true
+        default: "examples/startup_input.example.json"
+      model:
+        description: "LLM model name"
+        required: false
+        default: "gpt-4o-mini"
+      max_website_chars:
+        description: "Max website chars to parse"
+        required: false
+        default: "12000"
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      LLM_API_BASE: ${{ secrets.LLM_API_BASE }}
+      LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+      LLM_MODEL: ${{ github.event.inputs.model }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate script
+        run: python -m py_compile startup_evaluator.py
+
+      - name: Validate required secrets
+        run: |
+          test -n "$LLM_API_KEY" || (echo "Missing required secret: LLM_API_KEY" && exit 1)
+          if [ -z "$LLM_API_BASE" ]; then
+            echo "LLM_API_BASE not set; defaulting to https://api.openai.com/v1"
+            echo "LLM_API_BASE=https://api.openai.com/v1" >> "$GITHUB_ENV"
+          fi
+
+      - name: Run startup evaluator
+        run: |
+          python startup_evaluator.py \
+            --input "${{ github.event.inputs.input_json }}" \
+            --output evaluation_report.json \
+            --markdown evaluation_report.md \
+            --max-website-chars "${{ github.event.inputs.max_website_chars }}"
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: startup-evaluation-report
+          path: |
+            evaluation_report.json
+            evaluation_report.md
